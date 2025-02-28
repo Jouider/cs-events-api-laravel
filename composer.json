@@ -12,9 +12,11 @@
         "guzzlehttp/guzzle": "^7.2",
         "haydenpierce/class-finder": "^0.5.3",
         "laravel/framework": "^11.0",
+        "laravel/reverb": "^1.4",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.7",
         "plesk/ext-laravel-integration": "*",
+        "pusher/pusher-php-server": "^7.2",
         "staudenmeir/eloquent-has-many-deep": "^1.7"
     },
     "require-dev": {

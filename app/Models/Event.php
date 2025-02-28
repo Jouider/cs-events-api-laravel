@@ -42,13 +42,14 @@ class Event extends BaseModel
 
     // Hidden properties
     protected $hidden = [
-        // example: 'organizer_id'
+        'organizer',
     ];
 
     // Appended attributes
     protected $appends = [
         'cover_image_url', // Add the custom cover_image_url attribute
         'available_spots', // Add the available_spots attribute
+        "organiser_name",
     ];
 
     // Dates
@@ -74,6 +75,10 @@ class Event extends BaseModel
         }
     
         return str_starts_with($this->cover_image, 'http') ? $this->cover_image : url($this->cover_image);
+    }
+    public function getOrganiserNameAttribute()
+    {
+    return $this->organizer->email;
     }
 
     public function getAvailableSpotsAttribute()

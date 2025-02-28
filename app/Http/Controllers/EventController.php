@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
 use App\Models\Event;
+use App\Models\User;
+use App\Notifications\EventUpdatedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -14,7 +17,7 @@ class EventController extends CrudController
 {
     protected $table = 'events';
     protected $modelClass = Event::class;
-    protected $restricted = ['read_one', 'read_all', 'update', 'delete'];
+    protected $restricted = [ 'update', 'delete'];
 
     protected function getTable()
     {
@@ -39,11 +42,70 @@ class EventController extends CrudController
             }
         }
     }
+    protected function afterUpdateOne($modelClass, Request $request)
+    {
+        // Récupérer l'événement mis à jour
+        $event = Event::find($request->id);
+    
+        // Vérifier que l'événement existe
+        if (!$event) {
+            return response()->json([
+                'success' => false,
+                'errors' => [__('events.not_found')],
+            ]);
+        }
+    
+        // Récupérer tous les utilisateurs ayant réservé l'événement
+        $users = Booking::where('event_id', $event->id)
+                        ->pluck('user_id')
+                        ->unique(); // Utilisation de unique pour ne pas envoyer de doublons
+    
+        foreach ($users as $userId) {
+            $user = User::find($userId);
+            if ($user) {
+                // Send notification to user
+                $user->notify(new EventUpdatedNotification($event));
+            }
+        }
+        
+    }
+    
 
     public function readAll(Request $request)
-    {
-        return Event::all();
+{
+    try {
+        $params = $this->getDatatableParams($request);
+        // Désactiver la vérification des permissions pour un accès public
+        $params->checkPermission = false;
+        $query = $this->getReadAllQuery()->dataTable($params);
+
+        if ($request->input('per_page', 50) === 'all') {
+            $items = $query->get();
+        } else {
+            $items = $query->paginate($request->input('per_page', 50));
+        }
+        $items = collect(method_exists($items, 'items') ? $items->items() : $items);
+
+        return response()->json(
+            [
+                'success' => true,
+                'data'    => [
+                    'items' => $items,
+                    'meta'  => [
+                        'current_page' => method_exists($items, 'currentPage') ? $items->currentPage() : 1,
+                        'last_page'    => method_exists($items, 'lastPage') ? $items->lastPage() : 1,
+                        'total_items'  => method_exists($items, 'total') ? $items->total() : $items->count(),
+                    ],
+                ],
+            ]
+        );
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'errors'  => [__('common.unexpected_error')],
+        ]);
     }
+}
 
     public function getUserEvents()
     {

@@ -32,6 +32,9 @@ Route::prefix('bookings')->name('bookings.')->group(function () {
     // Create a new booking (authenticated users only)
     Route::middleware('auth:api')->post('/', [BookingController::class, 'createOne']);
 
+    // Create a new booking (authenticated users only)
+    Route::middleware('auth:api')->get('/', [BookingController::class, 'readAll']);
+
     // Delete a specific booking (authenticated users only)
     Route::middleware('auth:api')->delete('/{id}', [BookingController::class, 'deleteOne']);
 });

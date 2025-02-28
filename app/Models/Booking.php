@@ -15,6 +15,14 @@ class Booking extends BaseModel
         'spots',
     ];
 
+    protected $appends = [
+        'event', // Add the custom cover_image_url attribute
+    ];
+    public function getEventAttribute()
+    {
+    return $this->event()->first();
+    }   
+
     // Relation avec l'utilisateur
     public function user()
     {
