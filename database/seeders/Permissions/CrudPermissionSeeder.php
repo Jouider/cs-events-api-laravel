@@ -2,6 +2,7 @@
 
 namespace Database\Seeders\Permissions;
 
+use App\Models\Role;
 use App\Services\ACLService;
 use Illuminate\Database\Seeder;
 
@@ -27,5 +28,8 @@ class CrudPermissionSeeder extends Seeder
             $aclService->assignScopePermissionsToRole($advertiserRole, 'interests', ['read']);
             $aclService->assignScopePermissionsToRole($advertiserRole, 'games', ['create', 'read_own']);
         */
+        $aclService->createScopePermissions('events', ['delete']);
+        $userRole = Role::where('name', 'admin')->first();
+        $aclService->assignScopePermissionsToRole($userRole, 'events', ['read','delete']);
     }
 }
