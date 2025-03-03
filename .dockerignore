@@ -1,7 +1,0 @@
-vendor/
-node_modules/
-.DS_Store
-.git
-.gitignore
-docker-compose.yml
-*.md
