@@ -222,4 +222,15 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
 
         return $rules;
     }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class, 'user_id');
+    }
+
+    public function events()
+    {
+        return $this->hasMany(Event::class, 'organizer_id');
+    }
+
 }
